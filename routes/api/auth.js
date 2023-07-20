@@ -84,7 +84,7 @@ async (req, res) => {
 
 //4. GET USER
 router.get("/:id", authmw,
-permissionsMiddlewareUser(true, false),
+permissionsMiddlewareUser(true, true),
 async (req, res) => {
   try {
     await usersValidationService.userIdValidation(req.params.id);
