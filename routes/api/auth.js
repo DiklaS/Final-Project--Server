@@ -117,21 +117,21 @@ async (req, res) => {
   }
 });
 
-//6. CHANGE ISBUSINESS STATUS
+//6. CHANGE ISADMIN STATUS
 router.patch("/:id", authmw, 
 permissionsMiddlewareUser(true, true),
 async (req, res) => {
   try {
     await usersValidationService.userIdValidation(req.params.id);
     const loggedInUserId = req.userData._id; 
-    if (req.params.id !== loggedInUserId) {
+    /* if (req.params.id !== loggedInUserId) {
       return res.status(403).send("Unauthorized");
-    }
+    } */
     let user = await usersServiceModel.getUserById(req.params.id);
     if (!user) {
       return res.status(404).send("User not found");
     }
-    user.isBusiness = !user.isBusiness;
+    user.isAdmin = !user.isAdmin;
     user = await user.save();
     return res.send(user);
   } catch (error) {

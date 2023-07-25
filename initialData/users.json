@@ -13,7 +13,10 @@
       "street": "nof ha hof",
       "houseNumber": 255
     },
-    
+    "image": {
+      "url":"http://localhost:8181/initialData/imgs/woman_avatar.png",
+      "alt":"profile image"
+    },
     "isAdmin": true
   },
   {
@@ -29,8 +32,11 @@
       "city": "Ashkeluna",
       "street": "nof ha hof",
       "houseNumber": 255
+    },
+    "image": {
+      "url":"http://localhost:8181/initialData/imgs/initialData/imgs/2022_ani_cartoon_27.jpg",
+      "alt":"profile image"
     }
-    
   },
   {
     "name": {

@@ -13,14 +13,14 @@ const normalizeUser = (userData) => {
     url:
       userData.image.url ||
       "https://pixabay.com/vectors/bicycle-bike-cycling-drive-profile-2026559/",
-    alt: userData.image.alt || "yellow fluffy chickens",
+    alt: userData.image.alt || "Profile image",
   };
   if (!userData.address) {
     userData.address = {};
   }
   userData.address = {
     ...userData.address,
-    state: userData.address.state || "not defined",
+    state: userData.address.state || "",
   }
   return {
     ...userData,

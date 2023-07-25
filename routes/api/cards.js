@@ -104,7 +104,7 @@ router.patch("/:id", authmw, async (req, res) => {
     if (!cardLike) {
       card.likes.push(user._id);
       card = await card.save();
-      return res.send(card);
+      return res.send(card);;
     }
     const cardLikes = card.likes.filter((id) => id !== user._id);
     card.likes = cardLikes;
