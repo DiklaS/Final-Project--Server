@@ -10,6 +10,9 @@ const config = require("config");
 const initialData = require("./initialData/initialData");
 const usersServiceModel = require("./model/mongodb/users/usersService");
 const app = express();
+const rateLimit = require("express-rate-limit");
+
+
 
 app.use(cors());
 app.use(logger);
@@ -22,6 +25,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 initialData();
 
 const uploadPath = path.join(__dirname, "uploads");
+
 
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
@@ -41,9 +45,14 @@ const storage = multer.diskStorage({
   },
 });
 
-
-
 const upload = multer({ storage: storage });
+
+const limiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, 
+  max: 200, 
+});
+
+app.use(limiter);
 
 app.put("/api/users/:id/upload-image", upload.single("image"), async (req, res) => {
   try {
@@ -59,10 +68,6 @@ app.put("/api/users/:id/upload-image", upload.single("image"), async (req, res) 
     res.status(400).json({ error: err.message });
   }
 });
-
-
-
-
 
 
 app.use("/api", apiRouter);

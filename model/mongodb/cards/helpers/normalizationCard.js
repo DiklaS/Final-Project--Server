@@ -7,8 +7,8 @@ const normalizeCard = async (card, userId) => {
   card.image = {
     url:
       card.image.url ||
-      "https://cdn.pixabay.com/photo/2020/04/07/17/01/chicks-5014152_960_720.jpg",
-    alt: card.image.alt || "yellow fluffy chickens",
+      "https://cdn.pixabay.com/photo/2019/04/02/21/47/cyclist-4098989_640.png",
+    alt: card.image.alt || "item",
   };
   if (!card.address) {
     card.address = {};

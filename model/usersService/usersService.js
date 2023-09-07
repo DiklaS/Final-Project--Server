@@ -38,11 +38,26 @@ const deleteUser = (id) => {
   }
 };
 
+const updateUserResetTokenByEmail = (email) => {
+  if (dbOption === "mongo") {
+    return usersServiceMongo.updateUserResetTokenByEmail(email);
+  }
+};
+
+const updatePasswordByEmail = (email, newPassword) => {
+  if (dbOption === "mongo") {
+    return usersServiceMongo.updatePasswordByEmail(email, newPassword);
+  }
+};
+
 module.exports = {
   registerUser,
   getUserByEmail,
   getAllUsers,
   getUserById,
   updateUser,
-  deleteUser
+  deleteUser,
+  updateUserResetTokenByEmail,
+  updatePasswordByEmail
+
 };

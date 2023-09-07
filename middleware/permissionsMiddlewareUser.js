@@ -24,12 +24,6 @@ const checkIfRegisteredId = async (tokenUserId, paramsUserId, res, next) => {
   }
 };
 
-/*
-  isBiz = every biz
-  isAdmin = is admin
-  isBizOwner = biz owner
-*/
-
 const permissionsMiddlewareUser = (isAdmin, isRegistered) => {
   return async (req, res, next) => {
     if (!req.userData) {

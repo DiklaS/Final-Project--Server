@@ -4,11 +4,22 @@ const hashService = require("../../utils/hash/hashService");
 const usersValidationService = require("../../validation/authValidationService");
 const normalizeUser = require("../../model/usersService/helpers/normalizationUserService");
 const usersServiceModel = require("../../model/usersService/usersService");
-const { generateToken } = require("../../utils/token/tokenService");
+//const { generateToken } = require("../../utils/token/tokenService");
 const CustomError = require("../../utils/CustomError");
 const authmw = require("../../middleware/authMiddleware");
 const permissionsMiddlewareUser = require("../../middleware/permissionsMiddlewareUser");
 const _ = require("lodash");
+const nodemailer = require("nodemailer");
+//const {generateToken} = require("../../utils/token/jwt")
+const { verifyToken, generateToken } = require("../../utils/token/tokenService");
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail", 
+  auth: {
+    user: "diklalavy@gmail.com", 
+    pass: "qsgyweljdngjrgbc", 
+  },
+});
 
 //1. REGISTER USER
 router.post("/", async (req, res) => {
@@ -62,7 +73,8 @@ router.post("/login", async (req, res) => {
     const token = await generateToken({
       _id: userData._id,
       isAdmin: userData.isAdmin,
-      isBusiness: userData.isBusiness,
+      imageUrl: userData.image.url,
+      imageAlt: userData.image.alt,
     });
     res.json({ token });
   } catch (err) {
@@ -124,9 +136,7 @@ async (req, res) => {
   try {
     await usersValidationService.userIdValidation(req.params.id);
     const loggedInUserId = req.userData._id; 
-    /* if (req.params.id !== loggedInUserId) {
-      return res.status(403).send("Unauthorized");
-    } */
+
     let user = await usersServiceModel.getUserById(req.params.id);
     if (!user) {
       return res.status(404).send("User not found");
@@ -138,7 +148,6 @@ async (req, res) => {
     return res.status(500).send(error.message);
   }
 });
-
 
 //7. DELETE USER
 router.delete(
@@ -159,5 +168,58 @@ router.delete(
   } 
 );
 
+ router.post("/password/:email", async (req, res) => {
+  try {
+    const userEmail = req.params.email;
+
+    const resetToken = await generateToken({ userEmail }, "1h"); // Implement your token generation logic
+
+    const user = await usersServiceModel.getUserByEmail(userEmail);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    // Send the password reset email
+    const resetLink = `http://localhost:3000/password/${resetToken}`;
+    const mailOptions = {
+      from: "diklalavy@gmail.com", // Your Gmail email address
+      to: "diklalavy@gmail.com", // User's email address user.email
+      subject: "Password Reset Request",
+      text: `Click the following link to reset your password: ${resetLink}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        res.status(500).json({ error: "Error sending email" });
+      } else {
+        console.log("Email sent:", info.response);
+        res.status(200).json({ message: "Password reset email sent successfully" });
+      }
+    });
+    const resetTokenExpiration = new Date(Date.now() + 4*60*60*1000); // 4 hour
+    await usersServiceModel.updateUserResetTokenByEmail(userEmail, resetToken, resetTokenExpiration)
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(400).json({ error: err.message });
+  }
+}); 
+
+router.post('/password_reset/', async (req, res) => {
+  try {
+    const { resetToken, newPassword} = req.body;
+    const isValidToken = await verifyToken(resetToken);
+    console.log(resetToken)
+    if (!isValidToken) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+    const hashedPassword = await hashService.generateHash(newPassword);
+    const userEmail = isValidToken.userEmail;
+    await usersServiceModel.updatePasswordByEmail(userEmail, hashedPassword);
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(400).json({ error: error.message });
+  }
+}); 
 
 module.exports = router;

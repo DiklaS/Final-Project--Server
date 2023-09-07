@@ -41,6 +41,8 @@ const schema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  resetToken: String, 
+  resetTokenExpiration: Date, 
 });
 
 const User = mongoose.model("users", schema);
