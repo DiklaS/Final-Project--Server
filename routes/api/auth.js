@@ -222,4 +222,30 @@ router.post('/password_reset/', async (req, res) => {
   }
 }); 
 
+router.post('/sendEmail', async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+
+    const mailOptions = {
+      from: 'diklalavy@gmail.com', // Replace with your email address
+      to: 'diklalavy@gmail.com', // Receiver's email
+      subject: 'New Contact Form Submission',
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ error: 'An error occurred while sending the email.' });
+      } else {
+        console.log('Email sent:', info.response);
+        res.status(200).json({ message: 'Email sent successfully.' });
+      }
+    });
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(400).json({ error: err.message });
+  }
+});
+
 module.exports = router;
