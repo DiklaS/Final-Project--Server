@@ -1,13 +1,8 @@
 const CustomError = require("../utils/CustomError");
 const { getUserById } = require("../model/usersService/usersService");
-/*
-    TODO:
-        finish isBizSpecific
-*/
 
 const checkIfRegisteredId = async (tokenUserId, paramsUserId, res, next) => {
   try {
-    //! joi the idcard
     const user = await getUserById(paramsUserId);
     
     if (!user) {
@@ -29,16 +24,15 @@ const permissionsMiddlewareUser = (isAdmin, isRegistered) => {
     if (!req.userData) {
       throw new CustomError("Must provide userData");
     }
-    console.log('isAdmin', req.userData.isAdmin)
     if (isAdmin && req.userData.isAdmin) {
       
       return next();
     }
 
     const userParamsId = req.params.id;
-    const userTokenId = req.userData._id.toString(); // Convert to string
+    const userTokenId = req.userData._id.toString(); // Convert to string 
 
-    if (isRegistered && userTokenId === userParamsId) {
+    if (isRegistered) {
       return checkIfRegisteredId(userTokenId, userParamsId, res, next);
     }
 

@@ -61,7 +61,6 @@ router.post("/", authmw,
 permissionsMiddleware(false, true, false),
 async (req, res) => {
   try {
-    console.log('gggg')
     await cardsValidationService.createCardValidation(req.body);
     
     let normalCard = await normalizeCard(req.body, req.userData._id);

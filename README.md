@@ -57,8 +57,8 @@ The server will start running and listen for incoming requests on the specified 
 - Login: POST http://localhost:8181/api/users/login
 - GET All Users: GET http://localhost:8181/api/users/ (For admin users, requires a token)
 - Get User: GET http://localhost:8181/api/users/:id (For registered or admin users, requires a token)
-- Edit User: PUT http://localhost:8181/api/users/:id (For admin users, requires a token)
-- Change IsAdmin Status: PATCH http://localhost:8181/api/users/:id (For registered admin users, requires a token)
+- Edit User: PUT http://localhost:8181/api/users/:id (For registered or admin users, requires a token)
+- Change IsAdmin Status: PATCH http://localhost:8181/api/users/:id (For registered or admin users, requires a token)
 - Delete User: DELETE http://localhost:8181/api/users/:id (For admin users, requires a token)
 - Send Email Password Reset: POST http://localhost:8181/api/users/password/:email
 - Password Reset: POST http://localhost:8181/api/users/password_reset/

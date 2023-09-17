@@ -13,6 +13,7 @@ const nodemailer = require("nodemailer");
 //const {generateToken} = require("../../utils/token/jwt")
 const { verifyToken, generateToken } = require("../../utils/token/tokenService");
 
+
 const transporter = nodemailer.createTransport({
   service: "Gmail", 
   auth: {
@@ -24,12 +25,15 @@ const transporter = nodemailer.createTransport({
 //1. REGISTER USER
 router.post("/", async (req, res) => {
   try {
+    const existingUser = await usersServiceModel.getUserByEmail(req.body.email);
+    if (existingUser) {
+      return res.status(400).json({ error: "The email has already been taken by another user." });
+    } 
     await usersValidationService.registerUserValidation(req.body);
     req.body.password = await hashService.generateHash(req.body.password);
     req.body = normalizeUser(req.body);
     const newUser = await usersServiceModel.registerUser(req.body);
     res.send(_.pick(newUser, ["_id", "name", "phone", "email", "image", "address", "isBusiness"]));
-    //res.json(newUser)
   } catch (err) {
     res.status(400).json(err);
   }
@@ -113,7 +117,7 @@ async (req, res) => {
 
 //5. EDIT USER
 router.put("/:id", authmw,
-permissionsMiddlewareUser(false, true),
+permissionsMiddlewareUser(true, true),
 async (req, res) => {
   try {
     let normalUser = await normalizeUser(req.body);
@@ -152,7 +156,7 @@ async (req, res) => {
 //7. DELETE USER
 router.delete(
   "/:id", authmw,
-  permissionsMiddlewareUser(true, true),
+  permissionsMiddlewareUser(true, false),
   async (req, res) => {
     try {
       await usersValidationService.userIdValidation(req.params.id);
@@ -167,7 +171,7 @@ router.delete(
     }
   } 
 );
-
+//7. RESET PASSWORD EMAIL 
  router.post("/password/:email", async (req, res) => {
   try {
     const userEmail = req.params.email;
@@ -181,8 +185,8 @@ router.delete(
     // Send the password reset email
     const resetLink = `http://localhost:3000/password/${resetToken}`;
     const mailOptions = {
-      from: "diklalavy@gmail.com", // Your Gmail email address
-      to: "diklalavy@gmail.com", // User's email address user.email
+      from: "diklalavy@gmail.com", 
+      to: "diklalavy@gmail.com", 
       subject: "Password Reset Request",
       text: `Click the following link to reset your password: ${resetLink}`,
     };
@@ -203,7 +207,7 @@ router.delete(
     res.status(400).json({ error: err.message });
   }
 }); 
-
+//8. RESET PASSWORD 
 router.post('/password_reset/', async (req, res) => {
   try {
     const { resetToken, newPassword} = req.body;
@@ -221,7 +225,7 @@ router.post('/password_reset/', async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 }); 
-
+//9. CONTACT MESSAGE EMAIL
 router.post('/sendEmail', async (req, res) => {
   try {
     const { name, email, message } = req.body;

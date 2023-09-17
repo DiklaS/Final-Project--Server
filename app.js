@@ -12,8 +12,7 @@ const usersServiceModel = require("./model/mongodb/users/usersService");
 const app = express();
 const rateLimit = require("express-rate-limit");
 
-
-
+app.set('trust proxy', 'loopback');
 app.use(cors());
 app.use(logger);
 app.use(express.json());
@@ -25,7 +24,6 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 initialData();
 
 const uploadPath = path.join(__dirname, "uploads");
-
 
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath);
@@ -49,10 +47,12 @@ const upload = multer({ storage: storage });
 
 const limiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, 
-  max: 200, 
+  max: 300, 
+  
 });
 
-app.use(limiter);
+app.use(limiter); 
+
 
 app.put("/api/users/:id/upload-image", upload.single("image"), async (req, res) => {
   try {
